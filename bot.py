@@ -19,14 +19,12 @@ def echo_handler(message):
     }
 
     resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    block = soup.select_one(".texture-overlay #page #columns #block-system-main")
-
-    text = block.get_text("\n", strip=True)
-
-    bot.send_message(message.chat.id, text)
+    if resp.status_code == 404:
+        bot.send_message(message.chat.id, "Аэропорт не найден")
+    else:
+        soup = BeautifulSoup(resp.text, "html.parser")
+        block = soup.select_one(".texture-overlay #page #columns #block-system-main")
+        text = block.get_text("\n", strip=True)
+        bot.send_message(message.chat.id, text)
 
 bot.infinity_polling()
